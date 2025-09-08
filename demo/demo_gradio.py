@@ -88,9 +88,12 @@ def read_image_v2(img):
         raise ValueError(f"Invalid image type: {type(img)}")
     return img
 
-def load_file_for_preview(file_path, session_state):
+def load_file_for_preview(file_name, session_state):
     """Loads a file for preview, supports PDF and image files"""
     pdf_cache = session_state['pdf_cache']
+    
+    test_dir = current_config['test_images_dir']
+    file_path = os.path.join(test_dir, file_name) if file_name else ""
     
     if not file_path or not os.path.exists(file_path):
         return None, "<div id='page_info_box'>0 / 0</div>", session_state
@@ -152,7 +155,7 @@ def get_test_images():
     test_images = []
     test_dir = current_config['test_images_dir']
     if os.path.exists(test_dir):
-        test_images = [os.path.join(test_dir, name) for name in os.listdir(test_dir) 
+        test_images = [name for name in os.listdir(test_dir) 
                       if name.lower().endswith(('.png', '.jpg', '.jpeg', '.pdf'))]
     return test_images
 
@@ -323,7 +326,12 @@ def process_image_inference(session_state, test_image_input, file_input,
     dots_parser.min_pixels = min_pixels
     dots_parser.max_pixels = max_pixels
     
-    input_file_path = file_input if file_input else test_image_input
+    if file_input:
+        input_file_path = file_input
+    elif test_image_input:
+        input_file_path = os.path.join(current_config['test_images_dir'], test_image_input)
+    else:
+        input_file_path = None
     
     if not input_file_path:
         return None, "Please upload image/PDF file or select test image", "", "", gr.update(value=None), None, "", session_state
