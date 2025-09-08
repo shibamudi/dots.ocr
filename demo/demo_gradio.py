@@ -348,7 +348,7 @@ def process_image_inference(session_state, test_image_input, file_input,
             })
             
             total_elements = len(pdf_result['combined_cells_data'])
-            info_text = f"**PDF Information:**\n- Total Pages: {pdf_result['total_pages']}\n- Server: {current_config['ip']}:{current_config['port_vllm']}\n- Total Detected Elements: {total_elements}\n- Session ID: {pdf_result['session_id']}"
+            info_text = f"**PDF Information:**\n- Total Pages: {pdf_result['total_pages']}\n- Total Detected Elements: {total_elements}\n- Session ID: {pdf_result['session_id']}"
             
             current_page_layout_image = preview_image
             current_page_json = ""
