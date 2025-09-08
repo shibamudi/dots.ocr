@@ -31,8 +31,8 @@ from dots_ocr.parser import DotsOCRParser
 
 # ==================== Configuration ====================
 DEFAULT_CONFIG = {
-    'ip': "127.0.0.1",
-    'port_vllm': 8000,
+    'ip': os.environ.get('DOTS_OCR_IP', "127.0.0.1"),
+    'port_vllm': int(os.environ.get('DOTS_OCR_PORT', 8000)),
     'min_pixels': MIN_PIXELS,
     'max_pixels': MAX_PIXELS,
     'test_images_dir': "./assets/showcase_origin",
@@ -292,7 +292,7 @@ def parse_pdf_with_high_level_api(parser, pdf_path, prompt_mode):
 
 # ==================== Core Processing Function ====================
 def process_image_inference(session_state, test_image_input, file_input,
-                          prompt_mode, server_ip, server_port, min_pixels, max_pixels,
+                          prompt_mode, min_pixels, max_pixels,
                           fitz_preprocess=False
                           ):
     """Core function to handle image/PDF inference"""
@@ -311,15 +311,15 @@ def process_image_inference(session_state, test_image_input, file_input,
     processing_results = session_state['processing_results']
     
     current_config.update({
-        'ip': server_ip,
-        'port_vllm': server_port,
+        'ip': DEFAULT_CONFIG['ip'],
+        'port_vllm': DEFAULT_CONFIG['port_vllm'],
         'min_pixels': min_pixels,
         'max_pixels': max_pixels
     })
     
     # Update parser configuration
-    dots_parser.ip = server_ip
-    dots_parser.port = server_port
+    dots_parser.ip = DEFAULT_CONFIG['ip']
+    dots_parser.port = DEFAULT_CONFIG['port_vllm']
     dots_parser.min_pixels = min_pixels
     dots_parser.max_pixels = max_pixels
     
@@ -575,9 +575,6 @@ def create_gradio_interface():
                         info="Processes image via a PDF-like pipeline (image->pdf->200dpi image). Recommended if your image DPI is low."
                     )
                     with gr.Row():
-                        server_ip = gr.Textbox(label="Server IP", value=DEFAULT_CONFIG['ip'])
-                        server_port = gr.Number(label="Port", value=DEFAULT_CONFIG['port_vllm'], precision=0)
-                    with gr.Row():
                         min_pixels = gr.Number(label="Min Pixels", value=DEFAULT_CONFIG['min_pixels'], precision=0)
                         max_pixels = gr.Number(label="Max Pixels", value=DEFAULT_CONFIG['max_pixels'], precision=0)
             # Right side: Result Display
@@ -693,7 +690,7 @@ def create_gradio_interface():
             fn=process_image_inference,
             inputs=[
                 session_state, test_image_input, file_input,
-                prompt_mode, server_ip, server_port, min_pixels, max_pixels, 
+                prompt_mode, min_pixels, max_pixels, 
                 fitz_preprocess
             ],
             outputs=[
