@@ -393,7 +393,7 @@ def process_image_inference(session_state, test_image_input, file_input,
             parse_result = parse_image_with_high_level_api(dots_parser, image, prompt_mode, fitz_preprocess)
             
             if parse_result['filtered']:
-                 info_text = f"**Image Information:**\n- Original Size: {original_image.width} x {original_image.height}\n- Processing: JSON parsing failed, using cleaned text output\n- Server: {current_config['ip']}:{current_config['port_vllm']}\n- Session ID: {parse_result['session_id']}"
+                 info_text = f"**Image Information:**\n- Original Size: {original_image.width} x {original_image.height}\n- Processing: JSON parsing failed, using cleaned text output\n- Session ID: {parse_result['session_id']}"
                  processing_results.update({
                      'original_image': original_image, 'markdown_content': parse_result['md_content'],
                      'temp_dir': parse_result['temp_dir'], 'session_id': parse_result['session_id'],
@@ -410,7 +410,7 @@ def process_image_inference(session_state, test_image_input, file_input,
             })
             
             num_elements = len(parse_result['cells_data']) if parse_result['cells_data'] else 0
-            info_text = f"**Image Information:**\n- Original Size: {original_image.width} x {original_image.height}\n- Model Input Size: {parse_result['input_width']} x {parse_result['input_height']}\n- Server: {current_config['ip']}:{current_config['port_vllm']}\n- Detected {num_elements} layout elements\n- Session ID: {parse_result['session_id']}"
+            info_text = f"**Image Information:**\n- Original Size: {original_image.width} x {original_image.height}\n- Model Input Size: {parse_result['input_width']} x {parse_result['input_height']}\n- Detected {num_elements} layout elements\n- Session ID: {parse_result['session_id']}"
             
             current_json = json.dumps(parse_result['cells_data'], ensure_ascii=False, indent=2) if parse_result['cells_data'] else ""
             
