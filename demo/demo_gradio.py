@@ -5,6 +5,7 @@ A Gradio-based layout inference tool that supports image uploads and multiple ba
 It adopts a reference-style interface design while preserving the original inference logic.
 """
 
+import argparse
 import gradio as gr
 import json
 import os
@@ -796,11 +797,28 @@ def create_gradio_interface():
 # ==================== Main Program ====================
 if __name__ == "__main__":
     import sys
-    port = int(sys.argv[1])
+    
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument(
+        "--port", type=int, default=7860, help="The port number of the server"
+    )
+    argparser.add_argument(
+        "--host", type=str, default="127.0.0.1", help="The host of the server"
+    )
+    argparser.add_argument(
+        "--root_path",
+        type=str,
+        default=None,
+        help="The root path of the server, default is None (='/'), e.g. '/myapp'",
+    )
+    args = argparser.parse_args()
+
+    
     demo = create_gradio_interface()
     demo.queue().launch(
-        server_name="0.0.0.0", 
-        server_port=port, 
+        server_name=args.host,
+        server_port=args.port,
+        root_path=args.root_path,
         debug=False,
         i18n=i18n,
     )
