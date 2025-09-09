@@ -461,6 +461,71 @@ def clear_all_data(session_state):
 def update_prompt_display(prompt_mode):
     """Updates the prompt display content"""
     return dict_promptmode_to_prompt[prompt_mode]
+    
+i18n = gr.I18n(
+    zh={
+        "title_sub": "支持图片/PDF版面分析与结构化输出",
+        "upload_select": "📥 上传与选择",
+        "file_input": "上传 PDF/图片",
+        "select_example": "或选择示例图片",
+        "prompt_actions": "⚙️ 提示词与操作",
+        "select_prompt": "选择提示词模式",
+        "current_prompt": "当前提示词内容",
+        "parse_btn": "🔍 解析",
+        "clear_btn": "🗑️ 清空",
+        "advanced_config": "🛠️ 高级配置",
+        "fitz_preprocess_label": "启用 fitz_preprocess 图片预处理",
+        "fitz_preprocess_info": "将图片按 PDF 流程处理（图片->PDF->200dpi图片），图片 DPI 较低时建议开启。",
+        "min_pixels": "最小像素数",
+        "max_pixels": "最大像素数",
+        "file_preview": "👁️ 文件预览",
+        "layout_preview": "版面预览",
+        "prev_btn": "⬅ 上一页",
+        "next_btn": "下一页 ➡",
+        "waiting_result": "等待处理结果...",
+        "result_display": "✔️ 结果展示",
+        "tab_md_render": "Markdown 渲染预览",
+        "tab_md_raw": "Markdown 原始文本",
+        "tab_json": "当前页 JSON",
+        "md_parse_tip": "## 请点击解析按钮或选择示例进行单任务识别...",
+        "md_raw_wait": "🕐 等待解析结果...",
+        "md_raw_label": "Markdown 原始文本",
+        "json_wait": "🕐 等待解析结果...",
+        "json_label": "当前页 JSON",
+        "download_btn": "⬇️ 下载结果"
+    },
+    en={
+        "title_sub": "Supports image/PDF layout analysis and structured output",
+        "upload_select": "📥 Upload & Select",
+        "file_input": "Upload PDF/Image",
+        "select_example": "Or Select an Example",
+        "prompt_actions": "⚙️ Prompt & Actions",
+        "select_prompt": "Select Prompt",
+        "current_prompt": "Current Prompt Content",
+        "parse_btn": "🔍 Parse",
+        "clear_btn": "🗑️ Clear",
+        "advanced_config": "🛠️ Advanced Configuration",
+        "fitz_preprocess_label": "Enable fitz_preprocess for images",
+        "fitz_preprocess_info": "Processes image via a PDF-like pipeline (image->pdf->200dpi image). Recommended if your image DPI is low.",
+        "min_pixels": "Min Pixels",
+        "max_pixels": "Max Pixels",
+        "file_preview": "👁️ File Preview",
+        "layout_preview": "Layout Preview",
+        "prev_btn": "⬅ Previous",
+        "next_btn": "Next ➡",
+        "waiting_result": "Waiting for processing results...",
+        "result_display": "✔️ Result Display",
+        "tab_md_render": "Markdown Render Preview",
+        "tab_md_raw": "Markdown Raw Text",
+        "tab_json": "Current Page JSON",
+        "md_parse_tip": "## Please click the parse button to parse or select for single-task recognition...",
+        "md_raw_wait": "🕐 Waiting for parsing result...",
+        "md_raw_label": "Markdown Raw Text",
+        "json_wait": "🕐 Waiting for parsing result...",
+        "json_label": "Current Page JSON",
+        "download_btn": "⬇️ Download Results"
+    }
+)
 
 # ==================== Gradio Interface ====================
 def create_gradio_interface():
@@ -529,42 +594,42 @@ def create_gradio_interface():
         session_state = gr.State(value=get_initial_session_state())
         
         # Title
-        gr.HTML("""
+        gr.HTML(f"""
             <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
                 <h1 style="margin: 0; font-size: 2em;">🔍 dots.ocr</h1>
             </div>
             <div style="text-align: center; margin-bottom: 10px;">
-                <em>Supports image/PDF layout analysis and structured output</em>
+                <em>{i18n('title_sub')}</em>
             </div>
         """)
         
         with gr.Row():
             # Left side: Input and Configuration
             with gr.Column(scale=1, elem_id="left-panel"):
-                gr.Markdown("### 📥 Upload & Select")
+                gr.Markdown(f"### {i18n('upload_select')}")
                 file_input = gr.File(
-                    label="Upload PDF/Image", 
+                    label=i18n("file_input"), 
                     type="filepath", 
                     file_types=[".pdf", ".jpg", ".jpeg", ".png"],
                 )
                 
                 test_images = get_test_images()
                 test_image_input = gr.Dropdown(
-                    label="Or Select an Example",
+                    label=i18n('select_example'),
                     choices=[""] + test_images,
                     value="",
                 )
 
-                gr.Markdown("### ⚙️ Prompt & Actions")
+                gr.Markdown(f"### {i18n('prompt_actions')}")
                 prompt_mode = gr.Dropdown(
-                    label="Select Prompt",
+                    label=i18n('select_prompt'),
                     choices=["prompt_layout_all_en", "prompt_layout_only_en", "prompt_ocr"],
                     value="prompt_layout_all_en",
                 )
                 
                 # Display current prompt content
                 prompt_display = gr.Textbox(
-                    label="Current Prompt Content",
+                    label=i18n('current_prompt'),
                     value=dict_promptmode_to_prompt[list(dict_promptmode_to_prompt.keys())[0]],
                     lines=4,
                     max_lines=8,
@@ -573,26 +638,26 @@ def create_gradio_interface():
                 )
                 
                 with gr.Row():
-                    process_btn = gr.Button("🔍 Parse", variant="primary", scale=2, elem_id="parse_button")
-                    clear_btn = gr.Button("🗑️ Clear", variant="secondary", scale=1)
+                    process_btn = gr.Button(i18n('parse_btn'), variant="primary", scale=2, elem_id="parse_button")
+                    clear_btn = gr.Button(i18n('clear_btn'), variant="secondary", scale=1)
                 
-                with gr.Accordion("🛠️ Advanced Configuration", open=False):
+                with gr.Accordion(i18n('advanced_config'), open=False):
                     fitz_preprocess = gr.Checkbox(
-                        label="Enable fitz_preprocess for images", 
+                        label=i18n('fitz_preprocess_label'), 
                         value=True,
-                        info="Processes image via a PDF-like pipeline (image->pdf->200dpi image). Recommended if your image DPI is low."
+                        info=i18n('fitz_preprocess_info')
                     )
                     with gr.Row():
-                        min_pixels = gr.Number(label="Min Pixels", value=DEFAULT_CONFIG['min_pixels'], precision=0)
-                        max_pixels = gr.Number(label="Max Pixels", value=DEFAULT_CONFIG['max_pixels'], precision=0)
+                        min_pixels = gr.Number(label=i18n('min_pixels'), value=DEFAULT_CONFIG['min_pixels'], precision=0)
+                        max_pixels = gr.Number(label=i18n('max_pixels'), value=DEFAULT_CONFIG['max_pixels'], precision=0)
             # Right side: Result Display
             with gr.Column(scale=6, variant="compact"):
                 with gr.Row():
                     # Result Image
                     with gr.Column(scale=3):
-                        gr.Markdown("### 👁️ File Preview")
+                        gr.Markdown(f"### {i18n('file_preview')}")
                         result_image = gr.Image(
-                            label="Layout Preview",
+                            label=i18n('layout_preview'),
                             visible=True,
                             height=800,
                             show_label=False
@@ -600,27 +665,27 @@ def create_gradio_interface():
                         
                         # Page navigation (shown during PDF preview)
                         with gr.Row():
-                            prev_btn = gr.Button("⬅ Previous", size="sm")
+                            prev_btn = gr.Button(i18n('prev_btn'), size="sm")
                             page_info = gr.HTML(
                                 value="<div id='page_info_box'>0 / 0</div>", 
                                 elem_id="page_info_html"
                             )
-                            next_btn = gr.Button("Next ➡", size="sm")
+                            next_btn = gr.Button(i18n('next_btn'), size="sm")
                         
                         # Info Display
                         info_display = gr.Markdown(
-                            "Waiting for processing results...",
+                            i18n('waiting_result'),
                             elem_id="info_box"
                         )
                     
                     # Markdown Result
                     with gr.Column(scale=3):
-                        gr.Markdown("### ✔️ Result Display")
+                        gr.Markdown(f"### {i18n('result_display')}")
                         
                         with gr.Tabs(elem_id="markdown_tabs"):
-                            with gr.TabItem("Markdown Render Preview"):
+                            with gr.TabItem(i18n('tab_md_render')):
                                 md_output = gr.Markdown(
-                                    "## Please click the parse button to parse or select for single-task recognition...",
+                                    i18n('md_parse_tip'),
                                     max_height=600,
                                     latex_delimiters=[
                                         {"left": "$$", "right": "$$", "display": True},
@@ -630,10 +695,10 @@ def create_gradio_interface():
                                     elem_id="markdown_output"
                                 )
                             
-                            with gr.TabItem("Markdown Raw Text"):
+                            with gr.TabItem(i18n('tab_md_raw')):
                                 md_raw_output = gr.Textbox(
-                                    value="🕐 Waiting for parsing result...",
-                                    label="Markdown Raw Text",
+                                    value=i18n('md_raw_wait'),
+                                    label=i18n('md_raw_label'),
                                     max_lines=100,
                                     lines=38,
                                     show_copy_button=True,
@@ -641,10 +706,10 @@ def create_gradio_interface():
                                     show_label=False
                                 )
                             
-                            with gr.TabItem("Current Page JSON"):
+                            with gr.TabItem(i18n('tab_json')):
                                 current_page_json = gr.Textbox(
-                                    value="🕐 Waiting for parsing result...",
-                                    label="Current Page JSON",
+                                    value=i18n('json_wait'),
+                                    label=i18n('json_label'),
                                     max_lines=100,
                                     lines=38,
                                     show_copy_button=True,
@@ -655,7 +720,7 @@ def create_gradio_interface():
                 # Download Button
                 with gr.Row():
                     download_btn = gr.DownloadButton(
-                        "⬇️ Download Results",
+                        i18n('download_btn'),
                         visible=False
                     )
         
@@ -727,5 +792,6 @@ if __name__ == "__main__":
     demo.queue().launch(
         server_name="0.0.0.0", 
         server_port=port, 
-        debug=True
+        debug=True,
+        i18n=i18n,
     )
