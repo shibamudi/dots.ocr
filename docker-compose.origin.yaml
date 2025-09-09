@@ -1,0 +1,30 @@
+services:
+  interceptor:
+    image: python:3.10-slim
+    restart: always
+    command: >
+      sh -c "pip install flask &&
+             printf 'from flask import Flask, jsonify, request\\n\\napp = Flask(__name__)\\n\\n@app.route(\"/\", defaults={\"path\": \"\"}, methods=[\"GET\", \"POST\", \"PUT\", \"DELETE\", \"PATCH\", \"OPTIONS\", \"HEAD\"])\\n@app.route(\"/<path:path>\", methods=[\"GET\", \"POST\", \"PUT\", \"DELETE\", \"PATCH\", \"OPTIONS\", \"HEAD\"])\\ndef catch_all(path):\\n    return jsonify({})\\n\\nif __name__ == \"__main__\":\\n    app.run(host=\"0.0.0.0\", port=8000)' > app.py &&
+             python -u app.py"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dotsocr-interceptor.rule=Path(`/manifest.json`) || PathPrefix(`/ocr/config`)
+      - traefik.http.services.dotsocr-interceptor.loadbalancer.server.port=8000
+  app:
+    image: python:3.10-slim
+    restart: always
+    working_dir: /app
+    volumes: 
+      - .:/app
+    environment:
+      - DOTS_OCR_IP=127.0.0.1
+      - DOTS_OCR_PORT=8000
+      - PYTHONPATH=/app
+    command: >
+      sh -c "pip install --no-cache-dir --upgrade pip &&
+             pip install --no-cache-dir -r requirements-front.txt && 
+             python3 -u demo/demo_gradio.py --host 0.0.0.0 --port 7860 --root_path /ocr"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dotsocr-app.rule=PathPrefix(`/ocr`)
+      - traefik.http.services.dotsocr-app.loadbalancer.server.port=7860
