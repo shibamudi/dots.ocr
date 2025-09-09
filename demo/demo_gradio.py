@@ -464,7 +464,7 @@ def update_prompt_display(prompt_mode):
     
 i18n = gr.I18n(
     zh={
-        "title_sub": "支持图片/PDF版面分析与结构化输出",
+        "title_sub": "多语言文档解析器，支持图片/PDF版面分析与结构化输出",
         "upload_select": "📥 上传与选择",
         "file_input": "上传 PDF/图片",
         "select_example": "或选择示例图片",
@@ -495,7 +495,7 @@ i18n = gr.I18n(
         "download_btn": "⬇️ 下载结果"
     },
     en={
-        "title_sub": "Supports image/PDF layout analysis and structured output",
+        "title_sub": "Multilingual Document Parser, Supports image/PDF layout analysis and structured output",
         "upload_select": "📥 Upload & Select",
         "file_input": "Upload PDF/Image",
         "select_example": "Or Select an Example",
@@ -724,6 +724,15 @@ def create_gradio_interface():
                         visible=False
                     )
         
+        gr.HTML(
+            """
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="color: #888; font-size: 12px;">页面包含由人工智能模型生成的内容，其生成内容的准确性和完整性无法保证，不代表我们的态度或观点。</p>
+                <p style="color: #888; font-size: 12px;">rednote hi lab. dots.ocr: Multilingual Document Layout Parsing in a Single Vision-Language Model. GitHub, 2025. URL: <a href="https://github.com/rednote-hilab/dots.ocr" target="_blank">https://github.com/rednote-hilab/dots.ocr</a>.</p>
+            </div>
+            """
+        )
+        
         # When the prompt mode changes, update the display content
         prompt_mode.change(
             fn=update_prompt_display,
@@ -792,6 +801,6 @@ if __name__ == "__main__":
     demo.queue().launch(
         server_name="0.0.0.0", 
         server_port=port, 
-        debug=True,
+        debug=False,
         i18n=i18n,
     )
