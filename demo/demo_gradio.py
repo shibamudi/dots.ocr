@@ -602,6 +602,9 @@ def create_gradio_interface():
             <div style="text-align: center; margin-bottom: 10px;">
                 <em>{i18n('title_sub')}</em>
             </div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span style="font-size: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 12px; border-radius: 12px; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">本应用模型及前端服务均为校内国产环境本地化部署</span>
+            </div>
         """)
         
         with gr.Row():
