@@ -466,10 +466,10 @@ def update_prompt_display(prompt_mode):
 i18n = gr.I18n(
     zh={
         "title_sub": "多语言文档解析器，支持图片/PDF版面分析与结构化输出",
-        "upload_select": "📥 上传与选择",
+        "upload_select": "1️⃣ 上传或选择文档",
         "file_input": "上传 PDF/图片",
         "select_example": "或选择示例图片",
-        "prompt_actions": "⚙️ 提示词与操作",
+        "actions": "2️⃣ 操作",
         "select_prompt": "选择提示词模式",
         "current_prompt": "当前提示词内容",
         "parse_btn": "🔍 解析",
@@ -497,10 +497,10 @@ i18n = gr.I18n(
     },
     en={
         "title_sub": "Multilingual Document Parser, Supports image/PDF layout analysis and structured output",
-        "upload_select": "📥 Upload & Select",
+        "upload_select": "1️⃣ Upload & Select",
         "file_input": "Upload PDF/Image",
         "select_example": "Or Select an Example",
-        "prompt_actions": "⚙️ Prompt & Actions",
+        "actions": "2️⃣ Actions",
         "select_prompt": "Select Prompt",
         "current_prompt": "Current Prompt Content",
         "parse_btn": "🔍 Parse",
@@ -623,34 +623,40 @@ def create_gradio_interface():
                     choices=[""] + test_images,
                     value="",
                 )
-
-                gr.Markdown(f"### {i18n('prompt_actions')}")
-                prompt_mode = gr.Dropdown(
-                    label=i18n('select_prompt'),
-                    choices=["prompt_layout_all_en", "prompt_layout_only_en", "prompt_ocr"],
-                    value="prompt_layout_all_en",
-                )
                 
-                # Display current prompt content
-                prompt_display = gr.Textbox(
-                    label=i18n('current_prompt'),
-                    value=dict_promptmode_to_prompt[list(dict_promptmode_to_prompt.keys())[0]],
-                    lines=4,
-                    max_lines=8,
-                    interactive=False,
-                    show_copy_button=True
-                )
-                
+                gr.Markdown(f"### {i18n('actions')}")
                 with gr.Row():
                     process_btn = gr.Button(i18n('parse_btn'), variant="primary", scale=2, elem_id="parse_button")
                     clear_btn = gr.Button(i18n('clear_btn'), variant="secondary", scale=1)
                 
                 with gr.Accordion(i18n('advanced_config'), open=False):
+                    with gr.Row():
+                        prompt_mode = gr.Dropdown(
+                            label=i18n('select_prompt'),
+                            choices=[
+                                ("版面分析与内容识别 / Layout Analysis and Content Recognition", 'prompt_layout_all_en'),
+                                ("仅版面分析 / Layout Analysis Only", 'prompt_layout_only_en'),
+                                ("仅内容识别 / Content Recognition Only", 'prompt_ocr')
+                            ],
+                            value="prompt_layout_all_en",
+                        )
+                        
+                        # Display current prompt content
+                        prompt_display = gr.Textbox(
+                            label=i18n('current_prompt'),
+                            value=dict_promptmode_to_prompt[list(dict_promptmode_to_prompt.keys())[0]],
+                            lines=4,
+                            max_lines=8,
+                            interactive=False,
+                            show_copy_button=True
+                        )
+                    
                     fitz_preprocess = gr.Checkbox(
                         label=i18n('fitz_preprocess_label'), 
                         value=True,
                         info=i18n('fitz_preprocess_info')
                     )
+                    
                     with gr.Row():
                         min_pixels = gr.Number(label=i18n('min_pixels'), value=DEFAULT_CONFIG['min_pixels'], precision=0)
                         max_pixels = gr.Number(label=i18n('max_pixels'), value=DEFAULT_CONFIG['max_pixels'], precision=0)
