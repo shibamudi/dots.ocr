@@ -1,0 +1,55 @@
+# dots.ocr frontend deployment.
+#
+# Replaces docker-compose.origin.yaml: instead of pulling python:3.10-slim and
+# installing deps at container start, each service is built from the
+# multi-stage Dockerfile in the repo root (build + target).
+#
+# Copy .env.example to .env and configure before `docker compose up`:
+#   cp .env.example .env
+#
+# Requires an external Traefik reverse proxy already running on a shared
+# Docker network to route:
+#   /manifest.json | /ocr/config  -> interceptor
+#   /ocr                           -> app
+# External vLLM inference backend is expected at DOTS_OCR_IP:DOTS_OCR_PORT.
+
+services:
+  interceptor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: interceptor
+    image: dotsocr-interceptor:latest
+    restart: always
+    environment:
+      - INTERCEPTOR_PORT=${INTERCEPTOR_PORT:-8000}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dotsocr-interceptor.rule=Path(`/manifest.json`) || PathPrefix(`/ocr/config`)
+      - traefik.http.services.dotsocr-interceptor.loadbalancer.server.port=${INTERCEPTOR_PORT:-8000}
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app
+    image: dotsocr-app:latest
+    restart: always
+    environment:
+      - DOTS_OCR_IP=${DOTS_OCR_IP:-127.0.0.1}
+      - DOTS_OCR_PORT=${DOTS_OCR_PORT:-8000}
+      - PYTHONPATH=/app
+    command:
+      - python
+      - -u
+      - demo/demo_gradio.py
+      - --host
+      - ${GRADIO_HOST:-0.0.0.0}
+      - --port
+      - ${GRADIO_PORT:-7860}
+      - --root_path
+      - ${GRADIO_ROOT_PATH:-/ocr}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dotsocr-app.rule=PathPrefix(`/ocr`)
+      - traefik.http.services.dotsocr-app.loadbalancer.server.port=${GRADIO_PORT:-7860}
