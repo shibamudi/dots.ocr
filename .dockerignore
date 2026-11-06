@@ -1,0 +1,47 @@
+# Build context filter for the frontend Dockerfile (root).
+# Keep nothing in the context that the image does not need.
+
+# --- Model weights / large artifacts (download separately) ---
+weights/
+output/
+temp/
+
+# --- Python caches & build artifacts ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.so
+build/
+dist/
+.eggs/
+
+# --- VCS & tooling ---
+.git/
+.gitignore
+.omo/
+.codegraph/
+.vscode/
+.idea/
+
+# --- Editor / OS junk ---
+*.swp
+*.swo
+*~
+.DS_Store
+
+# --- Local environment files (never bake into images) ---
+.env
+.env.*
+!.env.example
+.venv
+venv/
+env/
+ENV/
+
+# --- Docker-compose files are runtime config, not image content ---
+docker-compose*.yml
+docker-compose*.yaml
+
+# --- Logs ---
+*.log
