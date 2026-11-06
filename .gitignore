@@ -110,6 +110,9 @@ dmypy.json
 *.swo
 *~
 
+# OpenCode / agent tooling state
+.omo/
+
 # MacOS
 .DS_Store
 
