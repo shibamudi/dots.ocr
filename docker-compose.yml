@@ -27,6 +27,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.dotsocr-interceptor.rule=Path(`/manifest.json`) || PathPrefix(`/ocr/config`)
       - traefik.http.services.dotsocr-interceptor.loadbalancer.server.port=${INTERCEPTOR_PORT:-8000}
+    networks:
+      - default
+      - shared
 
   app:
     build:
@@ -49,7 +52,18 @@ services:
       - ${GRADIO_PORT:-7860}
       - --root_path
       - ${GRADIO_ROOT_PATH:-/ocr}
+    mem_limit: 2g
+    memswap_limit: 2g
+    cpus: 2
     labels:
       - traefik.enable=true
       - traefik.http.routers.dotsocr-app.rule=PathPrefix(`/ocr`)
       - traefik.http.services.dotsocr-app.loadbalancer.server.port=${GRADIO_PORT:-7860}
+      - traefik.http.routers.dotsocr-app.middlewares=cas-auth@docker
+    networks:
+      - default
+      - shared
+
+networks:
+  shared:
+    external: true
